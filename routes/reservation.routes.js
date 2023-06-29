@@ -66,30 +66,60 @@ router.get("/reservations/:reservationId", (req, res, next) => {
 		});
 });
 
-// // PUT /api/activities/:activityId  -  Updates a specific activity by id
-// router.put("/reservations/:reservationId", (req, res, next) => {
-// 	const { reservationId } = req.params;
+// PUT /api/reservations/:reservationId  -  Updates a specific reservation by id
+router.put("/reservations/:reservationId", (req, res, next) => {
+	const { reservationId } = req.params;
 
-// 	if (!mongoose.Types.ObjectId.isValid(reservationId)) {
-// 		res.status(400).json({ message: "Specified id is not valid" });
-// 		return;
-// 	}
+	if (!mongoose.Types.ObjectId.isValid(reservationId)) {
+		res.status(400).json({ message: "Specified id is not valid" });
+		return;
+	}
 
-// 	const { numberOfPeople } = req.body;
+	const { numberOfPeople, price } = req.body;
 
-// 	const updatedActivity = {
-// 		numberOfPeople,
-// 	};
+	const updatedReservation = {
+		numberOfPeople,
+		totalPrice: price * numberOfPeople,
+	};
 
-// 	Activity.findByIdAndUpdate(activityId, updatedActivity, { new: true })
-// 		.then((updatedActivity) => res.json(updatedActivity))
-// 		.catch((err) => {
-// 			console.log("Error updating activity", err);
-// 			res.status(500).json({
-// 				message: "Error updating activity",
-// 				error: err,
-// 			});
-// 		});
-// });
+	Reservation.findByIdAndUpdate(reservationId, updatedReservation, {
+		new: true,
+	})
+		.then((updatedReservation) => res.json(updatedReservation))
+		.catch((err) => {
+			console.log("Error updating activity", err);
+			res.status(500).json({
+				message: "Error updating activity",
+				error: err,
+			});
+		});
+});
+
+// DELETE /api/reservations/:reservationId  -  Deletes a specific reservation by id
+router.delete("/reservations/:reservationId", (req, res, next) => {
+	const { reservationId } = req.params;
+
+	if (!mongoose.Types.ObjectId.isValid(reservationId)) {
+		res.status(400).json({ message: "Specified id is not valid" });
+		return;
+	}
+
+	Reservation.findByIdAndRemove(reservationId)
+		// .then(deletedActivity => {
+		//     return Task.deleteMany({ _id: { $in: deletedActivity.tasks } }); // delete all tasks assigned to that project
+		// })
+		.then(() =>
+			res.json({
+				message: `Reservation with id ${reservationId} was removed successfully.`,
+			})
+		)
+		.catch((err) => {
+			console.log("error deleting reservation", err);
+			res.status(500).json({
+				message: "error deleting reservation",
+				error: err,
+			});
+		});
+});
 
 module.exports = router;
