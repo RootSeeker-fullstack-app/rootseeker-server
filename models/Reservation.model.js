@@ -1,5 +1,3 @@
-/** @format */
-
 const { Schema, model } = require("mongoose");
 
 const ReservationSchema = new Schema(
