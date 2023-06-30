@@ -35,7 +35,7 @@ router.post("/activities", isAuthenticated, (req, res, next) => {
 // GET /api/activities -  Retrieves all of the activities
 router.get("/activities", (req, res, next) => {
 	Activity.find()
-		.populate("user")
+		.populate("user",'-password')
 		.then((activitiesArr) => res.json(activitiesArr))
 		.catch((err) => {
 			console.log("Error getting list of activities", err);
@@ -56,7 +56,7 @@ router.get("/activities/:activityId", (req, res, next) => {
 	}
 
 	Activity.findById(activityId)
-		.populate("user")
+		.populate("user", "-password")
 		.then((activity) => res.json(activity))
 		.catch((err) => {
 			console.log("Error getting details of an activity", err);
@@ -68,7 +68,7 @@ router.get("/activities/:activityId", (req, res, next) => {
 });
 
 // PUT /api/activities/:activityId  -  Updates a specific activity by id
-router.put("/activities/:activityId", (req, res, next) => {
+router.put("/activities/:activityId", isAuthenticated, (req, res, next) => {
 	const { activityId } = req.params;
 
 	if (!mongoose.Types.ObjectId.isValid(activityId)) {
@@ -101,7 +101,7 @@ router.put("/activities/:activityId", (req, res, next) => {
 });
 
 // DELETE /api/activities/:activityId  -  Deletes a specific activity by id
-router.delete("/activities/:activityId", (req, res, next) => {
+router.delete("/activities/:activityId", isAuthenticated, (req, res, next) => {
 	const { activityId } = req.params;
 
 	if (!mongoose.Types.ObjectId.isValid(activityId)) {

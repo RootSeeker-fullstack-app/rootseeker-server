@@ -5,14 +5,15 @@ const mongoose = require("mongoose");
 const Reservation = require("../models/Reservation.model");
 const Activity = require("../models/Activity.model");
 const User = require("../models/User.model");
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 // POST /api/reservation - Create a new reservation
-router.post("/reservations", (req, res, next) => {
+router.post("/reservations", isAuthenticated, (req, res, next) => {
 	/// Activity we are going to take it from the props
-	const { user, activity, numberOfPeople, price } = req.body;
+	const { activity, numberOfPeople, price } = req.body;
 
 	const newReservation = {
-		user,
+		user: req.payload._id,
 		activity,
 		totalPrice: price * numberOfPeople,
 		numberOfPeople,
@@ -32,7 +33,7 @@ router.post("/reservations", (req, res, next) => {
 // GET /api/reservations -  Retrieves all of the reservations
 router.get("/reservations", (req, res, next) => {
 	Reservation.find()
-		.populate("user")
+		.populate("user", "-password")
 		.populate("activity")
 		.then((reservationsArr) => res.json(reservationsArr))
 		.catch((err) => {
@@ -54,7 +55,7 @@ router.get("/reservations/:reservationId", (req, res, next) => {
 	}
 
 	Reservation.findById(reservationId)
-		.populate("user")
+		.populate("user", "-password")
 		.populate("activity")
 		.then((reservation) => res.json(reservation))
 		.catch((err) => {
