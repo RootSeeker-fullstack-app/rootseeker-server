@@ -3,13 +3,14 @@ const router = require("express").Router();
 const mongoose = require("mongoose");
 
 const Activity = require("../models/Activity.model");
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 // POST /api/activities - Create a new activity
-router.post("/activities", (req, res, next) => {
-	const { name, description, duration, images, available, date, price, user } =
+router.post("/activities", isAuthenticated, (req, res, next) => {
+	const { name, description, duration, images, available, date, price } =
 		req.body;
 
-	const newProject = {
+	const newActivity = {
 		name,
 		description,
 		duration,
@@ -17,10 +18,10 @@ router.post("/activities", (req, res, next) => {
 		available,
 		date,
 		price,
-		user,
+		user: req.payload._id,
 	};
 
-	Activity.create(newProject)
+	Activity.create(newActivity)
 		.then((response) => res.status(201).json(response))
 		.catch((err) => {
 			console.log("Error creating new activity", err);
