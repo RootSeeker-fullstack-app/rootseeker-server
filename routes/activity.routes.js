@@ -3,6 +3,8 @@ const router = require("express").Router();
 const mongoose = require("mongoose");
 
 const Activity = require("../models/Activity.model");
+const Reservation = require("../models/Reservation.model");
+
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 // POST /api/activities - Create a new activity
@@ -110,12 +112,12 @@ router.delete("/activities/:activityId", isAuthenticated, (req, res, next) => {
 	}
 
 	Activity.findByIdAndRemove(activityId)
-		// .then(deletedActivity => {
-		//     return Task.deleteMany({ _id: { $in: deletedActivity.tasks } }); // delete all tasks assigned to that project
-		// })
+		.then(deletedActivity => {
+		    return Reservation.deleteMany({ activity: activityId });
+		})
 		.then(() =>
 			res.json({
-				message: `Activity with id ${activityId} was removed successfully.`,
+				message: `Activity with id ${activityId} and related reservations were removed successfully.`,
 			})
 		)
 		.catch((err) => {
