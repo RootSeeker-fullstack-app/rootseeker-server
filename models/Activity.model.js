@@ -36,6 +36,11 @@ const ActivitySchema = new Schema(
 			min: 0,
 			required: [true, "Please provide a price for the activity"],
 		},
+		maxParticipants: {
+			type: Number,
+			min: 1,
+			required: [true, "Please provide a maximum of participants for the activity"],
+		}
 	},
 	{
 		// this second object adds extra properties: `createdAt` and `updatedAt`
