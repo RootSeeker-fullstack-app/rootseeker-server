@@ -20,9 +20,11 @@ const ActivitySchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: "User",
 		},
-		images: {
-			type: String,
-		},
+		images: [
+			{
+				type: String,
+			},
+		],
 		available: {
 			type: Boolean,
 			default: true,
