@@ -2,6 +2,8 @@ const router = require("express").Router();
 const mongoose = require("mongoose");
 const User = require("../models/User.model");
 const Activity = require("../models/Activity.model");
+const jwt = require("jsonwebtoken");
+const fileUploader = require("../config/cloudinary.config");
 
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 
@@ -49,7 +51,7 @@ router.put("/users/:userId", isAuthenticated, (req, res, next) => {
 		return;
 	}
 
-	const { firstName, lastName, imgProfile } = req.body;
+	let { firstName, lastName, imgProfile } = req.body;
 
 	const updatedUser = {
 		firstName,
@@ -58,7 +60,16 @@ router.put("/users/:userId", isAuthenticated, (req, res, next) => {
 	};
 
 	User.findByIdAndUpdate(userId, updatedUser, { new: true })
-		.then((updatedUser) => res.json(updatedUser))
+		.then((updatedUser) => {
+			delete updatedUser._doc.password;
+			const { _id, email, username, imgProfile } = updatedUser;
+			const payload = { _id, email, username, imgProfile };
+			const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
+				algorithm: "HS256",
+				expiresIn: "6h",
+			});
+			res.json({ updatedUser, authToken });
+		})
 		.catch((err) => {
 			console.log("Error updating user", err);
 			res.status(500).json({

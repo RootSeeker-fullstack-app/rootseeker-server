@@ -10,6 +10,8 @@ const jwt = require("jsonwebtoken");
 // Require the User model in order to interact with the database
 const User = require("../models/User.model");
 
+const fileUploader = require("../config/cloudinary.config");
+
 // Require necessary (isAuthenticated) middleware in order to control access to specific routes
 const { isAuthenticated } = require("../middleware/jwt.middleware.js");
 
@@ -18,8 +20,7 @@ const saltRounds = 10;
 
 // POST /auth/signup  - Creates a new user in the database
 router.post("/signup", (req, res, next) => {
-	const { email, password, username, firstName, lastName, imgProfile } =
-		req.body;
+	let { email, password, username, firstName, lastName, imgProfile } = req.body;
 
 	// Check if email or password or name are provided as empty strings
 	if (email === "" || password === "" || username === "") {

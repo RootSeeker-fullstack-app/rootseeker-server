@@ -5,11 +5,28 @@ const mongoose = require("mongoose");
 const Activity = require("../models/Activity.model");
 const Reservation = require("../models/Reservation.model");
 
+const fileUploader = require("../config/cloudinary.config");
+
 const { isAuthenticated } = require("../middleware/jwt.middleware");
+
+// POST "/api/upload" => Route that receives the image, sends it to Cloudinary via the fileUploader and returns the image URL
+router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
+	// console.log("file is: ", req.file)
+
+	if (!req.file) {
+		next(new Error("No file uploaded!"));
+		return;
+	}
+
+	// Get the URL of the uploaded file and send it as a response.
+	// 'fileUrl' can be any name, just make sure you remember to use the same when accessing it on the frontend
+
+	res.json({ fileUrl: req.file.path });
+});
 
 // POST /api/activities - Create a new activity
 router.post("/activities", isAuthenticated, (req, res, next) => {
-	const { name, description, duration, images, available, date, price } =
+	let { name, description, duration, images, available, date, price } =
 		req.body;
 
 	const newActivity = {
@@ -24,7 +41,9 @@ router.post("/activities", isAuthenticated, (req, res, next) => {
 	};
 
 	Activity.create(newActivity)
-		.then((response) => res.status(201).json(response))
+		.then((response) => {
+			res.status(201).json(response);
+		})
 		.catch((err) => {
 			console.log("Error creating new activity", err);
 			res.status(500).json({
@@ -37,7 +56,7 @@ router.post("/activities", isAuthenticated, (req, res, next) => {
 // GET /api/activities -  Retrieves all of the activities
 router.get("/activities", (req, res, next) => {
 	Activity.find()
-		.populate("user",'-password')
+		.populate("user", "-password")
 		.then((activitiesArr) => res.json(activitiesArr))
 		.catch((err) => {
 			console.log("Error getting list of activities", err);
@@ -78,7 +97,7 @@ router.put("/activities/:activityId", isAuthenticated, (req, res, next) => {
 		return;
 	}
 
-	const { name, description, duration, images, available, date, price } =
+	let { name, description, duration, images, available, date, price } =
 		req.body;
 
 	const updatedActivity = {
@@ -112,8 +131,8 @@ router.delete("/activities/:activityId", isAuthenticated, (req, res, next) => {
 	}
 
 	Activity.findByIdAndRemove(activityId)
-		.then(deletedActivity => {
-		    return Reservation.deleteMany({ activity: activityId });
+		.then((deletedActivity) => {
+			return Reservation.deleteMany({ activity: activityId });
 		})
 		.then(() =>
 			res.json({
