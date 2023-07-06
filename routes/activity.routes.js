@@ -26,8 +26,18 @@ router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
 
 // POST /api/activities - Create a new activity
 router.post("/activities", isAuthenticated, (req, res, next) => {
-	let { name, description, duration, images, available, date, price, maxParticipants, category } =
-		req.body;
+	let {
+		name,
+		description,
+		duration,
+		images,
+		available,
+		date,
+		price,
+		maxParticipants,
+		category,
+		coordinates,
+	} = req.body;
 
 	const newActivity = {
 		name,
@@ -39,6 +49,7 @@ router.post("/activities", isAuthenticated, (req, res, next) => {
 		price,
 		maxParticipants,
 		category,
+		coordinates,
 		user: req.payload._id,
 	};
 
@@ -99,8 +110,17 @@ router.put("/activities/:activityId", isAuthenticated, (req, res, next) => {
 		return;
 	}
 
-	let { name, description, duration, images, available, date, price, maxParticipants, category } =
-		req.body;
+	let {
+		name,
+		description,
+		duration,
+		images,
+		available,
+		date,
+		price,
+		maxParticipants,
+		category,
+	} = req.body;
 
 	const updatedActivity = {
 		name,
@@ -111,7 +131,7 @@ router.put("/activities/:activityId", isAuthenticated, (req, res, next) => {
 		date,
 		price,
 		maxParticipants,
-		category
+		category,
 	};
 
 	Activity.findByIdAndUpdate(activityId, updatedActivity, { new: true })
