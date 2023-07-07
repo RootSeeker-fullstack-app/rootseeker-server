@@ -25,4 +25,4 @@ To run in your computer, follow these steps:
 
 <br>
 
-[Check it out!](https://rootseeker.netlify.app)
+A demo of the REST API can be found here: [https://rootseeker-api.adaptable.app/api/activities](https://rootseeker-api.adaptable.app/api/activities)
